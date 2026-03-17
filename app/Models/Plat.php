@@ -19,11 +19,6 @@ class Plat extends Model
     }
     public function categories()
     {
-        // 1. اسم الجدول: category_plats
-        // 2. المفتاح اللي كيربط هاد الموديل (Plat): plat_id
-        // 3. المفتاح اللي كيربط الموديل الآخر (Categorie): category_id
-        //return $this->belongsToMany(Categorie::class, 'category_plats', 'plat_id', 'category_id');
-        // زدت هنا 'category_plats' (سمية الجدول) و 'plat_id' و 'category_id'
         return $this->belongsToMany(Categorie::class, 'category_plats', 'plat_id', 'category_id')->withTimestamps();
     }
     // for Don't Repeat Yourself
