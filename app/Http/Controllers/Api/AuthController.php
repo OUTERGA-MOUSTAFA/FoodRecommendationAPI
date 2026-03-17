@@ -16,17 +16,21 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email|max:255',
-            'password' => ['required','min:8','string', 'confirmed', Password::defaults()],
+            'password' => ['required', 'min:8', 'string', 'confirmed', Password::defaults()],
+            'dietary_tags' => 'array',
+            'dietary_tags.*' => 'in:vegan,no_sugar,no_cholesterol,gluten_free,no_lactose',
         ]);
 
         $isFirstUser = User::count() === 0;
         $user = User::create(
             [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $isFirstUser ? 'admin' : 'client',
-        ]);
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'dietary_tags' => $request->dietary_tags,
+                'role' => $isFirstUser ? 'admin' : 'client',
+            ]
+        );
 
         // create token sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -70,9 +74,9 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Logged out successfully']);
     }
-    
+
     function user(Request $request)
     {
         return response()->json($request->user());
-    }   
+    }
 }
