@@ -29,4 +29,9 @@ class Plat extends Model
         }
         return null;
     }
+
+    public function ingredients()
+    {
+        return $this->belongsToMany(Ingredient::class, 'ingredient_plat', 'plat_id', 'ingredient_id')->withTimestamps();
+    }
 }
