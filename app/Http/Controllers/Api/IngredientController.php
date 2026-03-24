@@ -8,7 +8,21 @@ use Illuminate\Http\Request;
 
 class IngredientController extends Controller
 {
-     public function store(Request $request)
+    public function index(Request $request)
+    {
+        $query = Ingredient::query();
+
+        // 🔍 Filtrer par tag
+        if ($request->has('tag')) {
+            $query->whereJsonContains('tags', $request->tag);
+        }
+
+        $ingredients = $query->paginate($request->get('per_page', 10));
+
+        return response()->json($ingredients);
+    }
+
+    public function store(Request $request)
     {
         // autorization
         $this->authorize('create', Ingredient::class);
@@ -28,5 +42,49 @@ class IngredientController extends Controller
             'message' => 'Ingredient created successfully',
             'data' => $ingredient
         ], 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $ingredient = Ingredient::findOrFail($id);
+
+        //  Policy
+        $this->authorize('update', $ingredient);
+
+        //  Validation
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:100|unique:ingredients,name,' . $id,
+            'tags' => 'nullable|array',
+            'tags.*' => 'in:' . implode(',', Ingredient::TAGS),
+        ]);
+
+        // 🔄 Update
+        $ingredient->update($validated);
+
+        return response()->json([
+            'message' => 'Ingredient updated successfully',
+            'data' => $ingredient
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $ingredient = Ingredient::findOrFail($id);
+
+        //  Policy
+        $this->authorize('delete', $ingredient);
+
+        // Vérifier relation avec plats
+        if ($ingredient->plats()->exists()) {
+            return response()->json([
+                'message' => 'Cannot delete: ingredient is used in plats'
+            ], 409);
+        }
+
+        $ingredient->delete();
+
+        return response()->json([
+            'message' => 'Ingredient deleted successfully'
+        ]);
     }
 }
