@@ -71,7 +71,7 @@ class CategorieController extends Controller
         $request->validate([
             'name' => 'sometimes|string|max:100|unique:categories,name,' . $id,
             'description' => 'nullable|string',
-            'is_active' => 'boolean'
+            'is_active' => 'sometimes|boolean'
         ]);
 
         $categorie->update($request->only(['name', 'description', 'is_active']));
