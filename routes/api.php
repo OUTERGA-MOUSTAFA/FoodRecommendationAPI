@@ -32,7 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     
     // Création du endpoint POST /api/categories/{id}/plat
-    Route::post('/categorie/{id}/plats', [CategorieController::class, 'CategoriePlats']);
+    Route::post('/categorie/{id}/plats', [CategorieController::class, 'plates']);
 
     // Création du endpoint POST /api/categorie
     Route::apiResource('categories', CategorieController::class);

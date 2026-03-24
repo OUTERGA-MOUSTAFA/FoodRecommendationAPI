@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\PlateResource;
 use App\Models\Categorie;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategorieController extends Controller
 {
@@ -46,17 +48,27 @@ class CategorieController extends Controller
         return CategoryResource::collection($categories);
     }
 
-    public function show($id)
+    public function plates($id)
     {
-        // $categorie = Categorie::findOrFail($id); //Model NotFoundException
-        $categorie = Categorie::find($id);
-        if (!$categorie) {
-            return response()->json(['message' => 'Category not found'], 404);
-        }
-        return response()->json([
-            'categories' => $categorie,
-        ], 200);
-        return;
+        $categorie = Categorie::findOrFail($id);
+
+        $userId = auth()->id();
+
+        $plats = $categorie->plats()
+            // Filtrer disponibles (par défaut)
+            ->where('is_active', true)
+
+            // Ajouter score de recommandation
+            ->leftJoin('recommendations', function ($join) use ($userId) {
+                $join->on('plats.id', '=', 'recommendations.plat_id')
+                    ->where('recommendations.user_id', $userId);
+            })
+
+            ->select('plats.*', DB::raw('COALESCE(recommendations.score, 0) as recommendation_score'))
+
+            ->get();
+
+        return PlateResource::collection($plats);
     }
 
     public function update(Request $request, $id)
