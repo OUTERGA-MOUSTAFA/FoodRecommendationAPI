@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategorieController;
 use App\Http\Controllers\Api\PlatsController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 // Auth Actions
@@ -47,4 +48,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // PUT /api/plat/{id}
     // DELETE /api/plat/{id}
     Route::apiResource('plat', PlatsController::class);
+
+    // POST /api/addTags
+    Route::post('/addTags', [ProfileController::class, 'addTags']);
+
 });

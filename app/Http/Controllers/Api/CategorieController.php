@@ -13,20 +13,16 @@ class CategorieController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', Categorie::class);
-        // if (auth()->user()->role !== 'admin') {
-        //     return response()->json([
-        //         'message' => 'Forbidden: Only admins can create categories'
-        //     ], 403);
-        // }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|unique:categories,name|max:100',
             'description' => 'nullable|string',
         ]);
 
         $categorie = Categorie::create([
             'name' => $request->name,
             'description' => $request->description,
+            'is_active' => false,
             'user_id' => auth()->id()
         ]);
 
@@ -38,7 +34,7 @@ class CategorieController extends Controller
         $categories = Categorie::get();
         return response()->json([
             'categories' => $categories,
-        ],200);
+        ], 200);
         return;
     }
 
@@ -51,7 +47,7 @@ class CategorieController extends Controller
         }
         return response()->json([
             'categories' => $categorie,
-        ],200);
+        ], 200);
         return;
     }
 
@@ -64,7 +60,13 @@ class CategorieController extends Controller
         //     ], 403);
         // }
         $categorie = Categorie::findOrFail($id);
-        $categorie->update($request->all());
+        $request->validate([
+            'name' => 'sometimes|string|max:100|unique:categories,name,' . $id,
+            'description' => 'nullable|string',
+            'is_active' => 'boolean'
+        ]);
+
+        $categorie->update($request->only(['name', 'description', 'is_active']));
 
         return response()->json([
             'message' => 'updated',

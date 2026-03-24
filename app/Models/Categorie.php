@@ -10,6 +10,7 @@ class Categorie extends Model
     protected $fillable = [
         'name',
         'description',
+        'is_active',
         'user_id'
     ];
     public function plats()
