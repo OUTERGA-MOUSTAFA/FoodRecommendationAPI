@@ -37,7 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Création du endpoint POST /api/categorie
     Route::apiResource('categories', CategorieController::class);
 
-    // Création du endpoint GET /api/categorie/{id}
+    // Création du endpoint GET /api/categorie
     // Création du endpoint PUT /api/categorie/{id}
     // Création du endpoint DELETE /api/categorie/{id}
     Route::apiResource('categorie', CategorieController::class);
@@ -50,6 +50,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('plat', PlatsController::class);
 
     // POST /api/addTags
-    Route::post('/addTags', [ProfileController::class, 'addTags']);
+    Route::post('/addTags', [ProfileController::class, 'updateProfile']);
+    // DELETE /api/removeTags
+    Route::delete('/removeTags', [ProfileController::class, 'removeTag']);
 
 });

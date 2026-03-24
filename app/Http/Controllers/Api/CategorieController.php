@@ -36,22 +36,43 @@ class CategorieController extends Controller
     {
         $query = Categorie::query();
 
-        // 🔍 Filtrage par statut actif/inactif
-        if ($request->has('is_active')) {
-            $query->where('is_active', $request->is_active);
+        //  Filtrage par statut
+        if ($request->filled('is_active')) {
+            $isActive = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
+            $query->where('is_active', $isActive);
         }
 
         $perPage = $request->get('per_page', 10);
 
-        $categories = $query->with('user')->paginate($perPage);
+        $categories = $query
+            ->with(['user', 'plats']) //  ajout ici
+            ->latest()
+            ->paginate($perPage);
 
         return CategoryResource::collection($categories);
     }
 
-    public function plates($id)
-    {
-        $categorie = Categorie::findOrFail($id);
+    // public function show($id)
+    // {
+    //     $categorie = Categorie::with(['user', 'plats'])->findOrFail($id);
+    //     if (!$categorie) {
+    //         return response()->json([
+    //             'message' => 'Category not found',
+    //             'error' => 'NOT_FOUND'
+    //         ], 404);
+    //     }
+    //     return new CategoryResource($categorie);
+    // }
 
+    public function show($id)
+    {
+         $categorie = Categorie::with(['user', 'plats'])->findOrFail($id);
+        if (!$categorie) {
+            return response()->json([
+                'message' => 'Category not found',
+                'error' => 'NOT_FOUND'
+            ], 404);
+        }
         $userId = auth()->id();
 
         $plats = $categorie->plats()
@@ -86,7 +107,11 @@ class CategorieController extends Controller
             'is_active' => 'sometimes|boolean'
         ]);
 
-        $categorie->update($request->only(['name', 'description', 'is_active']));
+        $categorie->update([
+            'name' => $request->name ?? $categorie->name,
+            'description' => $request->description ?? $categorie->description,
+            'is_active' => $request->has('is_active') ? $request->is_active : $categorie->is_active,
+        ]);
 
         return response()->json([
             'message' => 'updated',
@@ -98,12 +123,12 @@ class CategorieController extends Controller
     {
         $categorie = Categorie::findOrFail($id);
 
-        // admin
+        //  Authorization
         $this->authorize('delete', $categorie);
 
-        // Vérifier s'il existe des plats actifs liés
+        //  Vérifier plats disponibles
         $hasActivePlats = $categorie->plats()
-            ->where('is_active', true)
+            ->where('plats.is_available', true)
             ->exists();
 
         if ($hasActivePlats) {
@@ -112,7 +137,7 @@ class CategorieController extends Controller
             ], 409);
         }
 
-        // Soft delete
+        //  Soft delete
         $categorie->delete();
 
         return response()->json([

@@ -153,4 +153,41 @@ class PlatsController extends Controller
             'message' => 'Plat deleted successfully!'
         ], 200);
     }
+
+    public function recommended()
+    {
+        $user = auth()->user();
+
+        $plates = Plat::query()
+            ->where('is_available', true)
+
+            // 🚀 EAGER LOADING (IMPORTANT)
+            ->with([
+                'ingredients:id,name,tags',
+                'category:id,name'
+            ])
+
+            ->get();
+
+        // 🎯 Ajouter score
+        $data = $plates->map(function ($plate) use ($user) {
+            $scoreData = $plate->calculateScore($user);
+
+            return [
+                'id' => $plate->id,
+                'name' => $plate->name,
+                'price' => $plate->price,
+                'image' => $plate->image,
+                'category' => $plate->category?->name,
+
+                'score' => $scoreData['score'],
+                'label' => $scoreData['label'],
+                'status' => $scoreData['status'],
+            ];
+        });
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
 }

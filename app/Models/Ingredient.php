@@ -26,7 +26,7 @@ class Ingredient extends Model
     ];
 
     public function plats()
-{
-    return $this->belongsToMany( Plat::class, 'ingredient_plat', 'ingredient_id', 'plat_id')->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Plat::class, 'ingredient_plat', 'ingredient_id', 'plat_id')->withTimestamps();
+    }
 }

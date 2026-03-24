@@ -7,10 +7,17 @@ use Illuminate\Auth\Access\Response;
 
 class ProfilePolicy
 {
-    public function updateDietaryTags(User $authUser, User $user)
+    public function updateDietaryTags(User $authUser, User $user): Response
     {
-        return $authUser->id === $user->id
-            && $authUser->role === 'client';
+        if ($authUser->id !== $user->id) {
+            return Response::deny('You can only update your own profile');
+        }
+
+        if ($authUser->role !== 'client') {
+            return Response::deny('Only clients can update dietary tags');
+        }
+
+        return Response::allow();
     }
 
     /**
