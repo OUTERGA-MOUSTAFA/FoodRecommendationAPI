@@ -84,19 +84,27 @@ class CategorieController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize('delete', Categorie::class);
-        Categorie::destroy($id);
+        $categorie = Categorie::findOrFail($id);
 
-        return response()->json(['message' => 'deleted'], 200);
-    }
+        // admin
+        $this->authorize('delete', $categorie);
 
-    function CategoriePlats($id)
-    {
-        $categorie = Categorie::with('plats')->findOrFail($id);
+        // Vérifier s'il existe des plats actifs liés
+        $hasActivePlats = $categorie->plats()
+            ->where('is_active', true)
+            ->exists();
+
+        if ($hasActivePlats) {
+            return response()->json([
+                'message' => 'Cannot delete category: it has active plats'
+            ], 409);
+        }
+
+        // Soft delete
+        $categorie->delete();
 
         return response()->json([
-            'message' => 'Here is your plats of category: ' . $categorie->name,
-            'data' => $categorie->plats
+            'message' => 'Category deleted successfully'
         ], 200);
     }
 }
