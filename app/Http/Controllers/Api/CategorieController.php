@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use App\Models\Categorie;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
@@ -29,13 +30,20 @@ class CategorieController extends Controller
         return response()->json($categorie, 201);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Categorie::get();
-        return response()->json([
-            'categories' => $categories,
-        ], 200);
-        return;
+        $query = Categorie::query();
+
+        // 🔍 Filtrage par statut actif/inactif
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->is_active);
+        }
+
+        $perPage = $request->get('per_page', 10);
+
+        $categories = $query->with('user')->paginate($perPage);
+
+        return CategoryResource::collection($categories);
     }
 
     public function show($id)
