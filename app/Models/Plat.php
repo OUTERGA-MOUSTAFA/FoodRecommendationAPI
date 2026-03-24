@@ -11,8 +11,15 @@ class Plat extends Model
         'description',
         'price',
         'image',
-        'user_id',
+        'is_available',
+        'category_id',
     ];
+
+    protected $casts = [
+        'is_available' => 'boolean',
+        'price' => 'decimal:2',
+    ];
+
     function user()
     {
         return $this->belongsTo(User::class);

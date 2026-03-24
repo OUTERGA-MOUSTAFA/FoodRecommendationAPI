@@ -23,8 +23,10 @@ class PlatsController extends Controller
             'description' => 'nullable|string|max:255',
             'price'       => 'required|numeric|min:10',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // 2MB
-            'category_id' => 'nullable|array',
-            'category_id.*' => 'exists:categories,id',
+            'is_available' => 'boolean',
+            'category_id' => 'required|exists:categories,id',
+            'ingredient_ids' => 'nullable|array',
+            'ingredient_ids.*' => 'exists:ingredients,id',
         ]);
 
         $imagePath = null;
@@ -41,11 +43,15 @@ class PlatsController extends Controller
             'user_id'     => auth()->id(),
         ]);
 
-
+        // attach category
         if ($request->has('category_id') && is_array($request->category_id)) {
             $plat->categories()->attach($request->category_id);
         }
 
+        // Sync ingrédients
+        if (!empty($validated['ingredient_ids'])) {
+            $plat->ingredients()->sync($validated['ingredient_ids']);
+        }
         return response()->json([
             'message' => 'Plat créé avec succès',
             'plat'    => $plat->load('categories') //Eager Loading plat infos and category
