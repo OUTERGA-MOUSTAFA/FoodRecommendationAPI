@@ -15,6 +15,10 @@ class Recommendation extends Model
         'status',
     ];
 
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_READY = 'ready';
+    const STATUS_FAILED = 'failed';
+    
     public function plat()
     {
         return $this->belongsTo(Plat::class);

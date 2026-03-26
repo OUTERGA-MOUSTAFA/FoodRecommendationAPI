@@ -10,33 +10,27 @@ use App\Jobs\GenerateRecommendationJob;
 class RecommendationController extends Controller
 {
     //  POST → lancer analyse
-    public function analyze($plate_id)
+    public function analyze($platId)
     {
         $user = auth()->user();
-        $plat = Plat::findOrFail($plate_id);
 
-        // 🔍 éviter duplication
-        $existing = Recommendation::where([
-            'user_id' => $user->id,
-            'plat_id' => $plat->id
-        ])->first();
+        $plat = Plat::findOrFail($platId);
 
-        //  créer / reset en processing
         Recommendation::updateOrCreate(
             [
                 'user_id' => $user->id,
                 'plat_id' => $plat->id
             ],
             [
+                'status' => Recommendation::STATUS_PROCESSING,
                 'score' => 0,
                 'label' => null,
                 'warning_message' => null,
-                'status' => 'processing',
             ]
         );
 
-        // dispatch job
-        GenerateRecommendationJob::dispatch($plat->id, $user->id);
+        // 🔥 dispatch async
+        GenerateRecommendationJob::dispatch($user->id, $plat->id);
 
         return response()->json([
             'message' => 'Analysis started',
