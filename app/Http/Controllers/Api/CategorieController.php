@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\PlateResource;
 use App\Models\Categorie;
 use Illuminate\Http\Request;
 use App\Jobs\GenerateRecommendationJob;
@@ -17,144 +18,109 @@ class CategorieController extends Controller
     {
         $this->authorize('create', Categorie::class);
 
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|unique:categories,name|max:100',
             'description' => 'nullable|string',
         ]);
 
         $categorie = Categorie::create([
-            'name' => $request->name,
-            'description' => $request->description,
+            ...$data,
             'is_active' => false,
             'user_id' => auth()->id()
         ]);
 
-        return response()->json($categorie, 201);
+        return response()->json([
+            'message' => 'Category created successfully',
+            'data' => new CategoryResource($categorie)
+        ], 201);
     }
 
     public function index(Request $request)
     {
         $query = Categorie::query();
 
-        //  Filtrage par statut
         if ($request->filled('is_active')) {
-            $isActive = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
-            $query->where('is_active', $isActive);
+            $query->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN));
         }
 
-        $perPage = $request->get('per_page', 10);
-
         $categories = $query
-            ->with(['user', 'plats']) //  ajout ici
+            ->select('id', 'name', 'description', 'is_active')
             ->latest()
-            ->paginate($perPage);
+            ->paginate($request->get('per_page', 10));
 
-        return CategoryResource::collection($categories);
+        return response()->json([
+            'message' => 'All categories retrieved successfully',
+            'data' => CategoryResource::collection($categories),
+            'meta' => [
+                'current_page' => $categories->currentPage(),
+                'last_page' => $categories->lastPage(),
+                'per_page' => $categories->perPage(),
+                'total' => $categories->total(),
+            ]
+        ]);
     }
-
-    // public function show($id)
-    // {
-    //     $categorie = Categorie::with(['user', 'plats'])->findOrFail($id);
-    //     if (!$categorie) {
-    //         return response()->json([
-    //             'message' => 'Category not found',
-    //             'error' => 'NOT_FOUND'
-    //         ], 404);
-    //     }
-    //     return new CategoryResource($categorie);
-    // }
 
     public function show($id)
     {
         $user = auth()->user();
 
-        $plats = Plat::where('is_available', true)->get();
+        $categorie = Categorie::findOrFail($id);
 
-        $data = $plats->map(function ($plat) use ($user) {
-
-            $recommendation = Recommendation::where([
-                'user_id' => $user->id,
-                'plat_id' => $plat->id
-            ])->first();
-
-            // pas encore calculé
-            if (!$recommendation) {
-
-                // dispatch job
-                GenerateRecommendationJob::dispatch($plat, $user);
-
-                return [
-                    'id' => $plat->id,
-                    'name' => $plat->name,
-                    'status' => 'processing'
-                ];
-            }
-
-            return [
-                'id' => $plat->id,
-                'name' => $plat->name,
-                'score' => $recommendation->score,
-                'label' => $recommendation->label,
-                'warning_message' => $recommendation->warning_message,
-                'status' => $recommendation->status,
-            ];
-        });
+        $plats = $categorie->plats()
+            ->where('is_available', true)
+            ->with(['recommendation' => function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            }])
+            ->get();
 
         return response()->json([
-            'data' => $data
+            'message' => "All plats for category: {$categorie->name}",
+            'data' => PlateResource::collection($plats)
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $this->authorize('update', Categorie::class);
-        // if (auth()->user()->role !== 'admin') {
-        //     return response()->json([
-        //         'message' => 'Forbidden: Only admins can Update categories'
-        //     ], 403);
-        // }
         $categorie = Categorie::findOrFail($id);
-        $request->validate([
+
+        $this->authorize('update', $categorie);
+
+        $data = $request->validate([
             'name' => 'sometimes|string|max:100|unique:categories,name,' . $id,
             'description' => 'nullable|string',
             'is_active' => 'sometimes|boolean'
         ]);
 
-        $categorie->update([
-            'name' => $request->name ?? $categorie->name,
-            'description' => $request->description ?? $categorie->description,
-            'is_active' => $request->has('is_active') ? $request->is_active : $categorie->is_active,
-        ]);
+        $categorie->update($data);
 
         return response()->json([
-            'message' => 'updated',
-            'categorie' => $categorie
-        ], 200);
+            'message' => 'Category updated successfully',
+            'data' => new CategoryResource($categorie)
+        ]);
     }
 
     public function destroy($id)
     {
         $categorie = Categorie::findOrFail($id);
 
-        //  Authorization
         $this->authorize('delete', $categorie);
 
-        //  Vérifier plats disponibles
         $hasActivePlats = $categorie->plats()
-            ->where('plats.is_available', true)
+            ->where('is_available', true)
             ->exists();
 
         if ($hasActivePlats) {
             return response()->json([
-                'message' => 'Cannot delete category: it has active plats'
+                'message' => 'Cannot delete category with active plats'
             ], 409);
         }
 
-        //  Soft delete
+        $name = $categorie->name;
+
         $categorie->delete();
 
         return response()->json([
-            'message' => 'Category deleted successfully'
-        ], 200);
+            'message' => "Category '{$name}' deleted successfully"
+        ]);
     }
 }

@@ -18,10 +18,16 @@ class PlateResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'price' => $this->price ?? null,
+            'image' => $this->image,
             'is_available' => (bool) $this->is_available,
+            'categories' => $this->categories->pluck('name'),
+            'ingredients' => $this->ingredients->pluck('name'),
 
-            // Score de recommandation
-            'recommendation_score' => $this->recommendation_score ?? 0,
+            // Recommandation
+            'score' => $this->recommendation->score ?? null,
+            'label' => $this->recommendation->label ?? null,
+            'warning_message' => $this->recommendation->warning_message ?? null,
+            'status' => $this->recommendation->status ?? 'processing',
         ];
     }
 }

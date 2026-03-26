@@ -7,11 +7,13 @@ use App\Http\Resources\RecommendationResource;
 use App\Models\Plat;
 use App\Models\Recommendation;
 use App\Jobs\GenerateRecommendationJob;
-
+use Illuminate\Http\Request;
 
 class RecommendationController extends Controller
 {
+    // =========================
     //  POST → lancer analyse
+    // =========================
     public function analyze($platId)
     {
         $user = auth()->user();
@@ -27,54 +29,73 @@ class RecommendationController extends Controller
                 'status' => Recommendation::STATUS_PROCESSING,
                 'score' => 0,
                 'label' => null,
-                'warning_message' => null,
+                'warning_message' => 'Analyse en cours...',
             ]
         );
 
-        // 🔥 dispatch async
         GenerateRecommendationJob::dispatch($user->id, $plat->id);
 
         return response()->json([
-            'message' => 'Analysis started',
+            'message' => "Analysis started for plat: {$plat->title}",
             'status' => 'processing'
         ], 202);
     }
 
+    // =========================
     //  GET → historique
-    public function index()
-{
-    $user = auth()->user();
+    // =========================
+    public function index(Request $request)
+    {
+        $user = auth()->user();
 
-    $query = Recommendation::query()
-        ->where('user_id', $user->id)
-        ->with(['plat:id,title']) // ✅ eager loading optimisé
-        ->latest();
+        $query = Recommendation::query()
+            ->where('user_id', $user->id)
+            ->with('plat:id,title')
+            ->latest();
 
-    // 🔥 pagination
-    $recommendations = $query->paginate(10);
+        //  filter by status (optionnel)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
-    return RecommendationResource::collection($recommendations);
-}
-    
+        $recommendations = $query->paginate($request->get('per_page', 10));
 
+        return response()->json([
+            'message' => 'Recommendations retrieved successfully',
+            'data' => RecommendationResource::collection($recommendations),
+            'meta' => [
+                'current_page' => $recommendations->currentPage(),
+                'last_page' => $recommendations->lastPage(),
+                'per_page' => $recommendations->perPage(),
+                'total' => $recommendations->total(),
+            ]
+        ]);
+    }
+
+    // =========================
     //  GET → résultat d’un plat
-    public function show($plate_id)
+    // =========================
+    public function show($platId)
     {
         $user = auth()->user();
 
         $recommendation = Recommendation::where([
             'user_id' => $user->id,
-            'plat_id' => $plate_id
-        ])->with('plat')->first();
+            'plat_id' => $platId
+        ])
+        ->with('plat:id,title')
+        ->first();
 
         if (!$recommendation) {
             return response()->json([
+                'success' => false,
                 'message' => 'Recommendation not found'
             ], 404);
         }
 
         return response()->json([
-            'data' => $recommendation
+            'message' => "Recommendation for plat: {$recommendation->plat->title}",
+            'data' => new RecommendationResource($recommendation)
         ]);
     }
 }

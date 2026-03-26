@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategorieController;
 use App\Http\Controllers\Api\IngredientController;
@@ -59,11 +60,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('plat', PlatsController::class);
 
     // POST /api/addTags
-    Route::post('/addTags', [ProfileController::class, 'updateProfile']);
+    Route::post('/updateTags', [ProfileController::class, 'updateProfile']);
     // DELETE /api/removeTags
     Route::delete('/removeTags', [ProfileController::class, 'removeTag']);
 
     Route::post('/recommendations/analyze/{plate_id}', [RecommendationController::class, 'analyze']);
     Route::apiResource('recommendations', RecommendationController::class);
+
+    // Admin Statistiques Globales
+    Route::get('/admin/stats', [AdminController::class, 'stats']);
 
 });

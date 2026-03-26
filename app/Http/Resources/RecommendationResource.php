@@ -20,15 +20,13 @@ class RecommendationResource extends JsonResource
             'label' => $this->label,
             'status' => $this->status,
             'warning_message' => $this->warning_message,
-            'conflicting_tags' => $this->conflicting_tags,
 
-            // 🔥 relation plat
+            //  relation plat
             'plat' => [
                 'id' => $this->plat?->id,
                 'title' => $this->plat?->title,
             ],
-
-            'created_at' => $this->created_at,
         ];
+        
     }
 }

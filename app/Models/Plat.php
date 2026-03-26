@@ -42,4 +42,9 @@ class Plat extends Model
     {
         return $this->belongsToMany(Ingredient::class, 'ingredient_plat', 'plat_id', 'ingredient_id')->withTimestamps();
     }
+
+    public function recommendation()
+    {
+        return $this->hasOne(Recommendation::class);
+    }
 }

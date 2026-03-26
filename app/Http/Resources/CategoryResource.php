@@ -16,11 +16,6 @@ class CategoryResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'is_active' => (bool) $this->is_active,
-            'created_at' => $this->created_at,
-            'user' => [
-                'id' => $this->user?->id,
-                'name' => $this->user?->name,
-            ],
         ];
     }
 }
