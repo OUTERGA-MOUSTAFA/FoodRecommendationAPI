@@ -38,17 +38,18 @@ class GenerateRecommendationJob implements ShouldQueue
         $ingredients = $plat->ingredients->pluck('tag')->toArray();
         $restrictions = $user->dietary_tags ?? [];
 
-        // 🔥 score local
+        // ✅ Score backend (FIABLE)
         $conflicts = $this->detectConflicts($ingredients, $restrictions);
         $score = max(0, 100 - (count($conflicts) * 25));
 
-        $warningMessage = null;
+        // 🔥 Toujours appeler GROQ pour message
+        $aiResult = $this->callGroq($plat->title, $ingredients, $restrictions);
 
-        // 🔥 appel GROQ seulement si mauvais score
-        if ($score < 50) {
-            $warningMessage = $this->callGroq($plat->title, $ingredients, $restrictions);
-        }
+        // ✅ fallback si IA échoue
+        $warningMessage = $aiResult['warning_message']
+            ?? $this->generateFallbackMessage($score, $conflicts);
 
+        // ✅ résultat final
         $result = $this->buildResult($score, $warningMessage);
 
         Recommendation::updateOrCreate(
@@ -69,36 +70,28 @@ class GenerateRecommendationJob implements ShouldQueue
     // =========================
     // 🔥 GROQ CALL
     // =========================
-    private function callGroq(string $platName, array $ingredients, array $restrictions): ?string
+    private function callGroq(string $platName, array $ingredients, array $restrictions): ?array
     {
         try {
             $response = Http::withToken(config('services.groq.key'))
                 ->timeout(20)
                 ->post(config('services.groq.url'), [
+                    "model" => "llama3-8b-8192",
                     "messages" => [
-                        [
-                            "role" => "system",
-                            "content" => "Tu es un expert en nutrition."
-                        ],
                         [
                             "role" => "user",
                             "content" => $this->buildPrompt($platName, $ingredients, $restrictions)
                         ]
                     ],
-                    "temperature" => 0.3
+                    "temperature" => 0.2
                 ]);
 
-            if ($response->failed()) {
-                Log::error('Groq API failed', ['body' => $response->body()]);
-                return null;
-            }
+            if ($response->failed()) return null;
 
             $text = $response->json('choices.0.message.content');
 
             return $this->parseResponse($text);
-
         } catch (\Throwable $e) {
-            Log::error('Groq Exception', ['error' => $e->getMessage()]);
             return null;
         }
     }
@@ -108,24 +101,62 @@ class GenerateRecommendationJob implements ShouldQueue
     // =========================
     private function buildPrompt(string $platName, array $ingredients, array $restrictions): string
     {
-        return "
-        Plat: {$platName}
+        return <<<PROMPT
+        You are a food safety and nutrition expert.
+
+        Analyze if the following dish is compatible with the user's dietary restrictions.
+
+        Dish: {$platName}
         Ingredients: " . implode(', ', $ingredients) . "
         Restrictions: " . implode(', ', $restrictions) . "
 
-        Explique en français pourquoi ce plat n'est pas recommandé.
-        Réponse courte (1 phrase).
-        ";
+        Rules:
+        - Start score at 100
+        - Subtract 25 for each conflict
+        - Score must be between 0 and 100
+        - Be slightly lenient (do not over-penalize)
+        - If score < 50 → provide a clear warning in French
+        - If score >= 50 → warning_message must be null
+
+        Respond ONLY in valid JSON format:
+        {
+        "score": number,
+        "warning_message": string|null
+        }
+        PROMPT;
     }
 
     // =========================
     // 🔥 PARSE
     // =========================
-    private function parseResponse(?string $text): ?string
+    private function parseResponse(?string $text): array
     {
-        if (!$text) return null;
+        if (!$text) {
+            return [
+                'score' => 50,
+                'warning_message' => 'Analyse effectuée'
+            ];
+        }
 
-        return trim($text);
+        // extraire JSON
+        if (preg_match('/\{.*\}/s', $text, $match)) {
+            $data = json_decode($match[0], true);
+
+            if ($data && isset($data['score'])) {
+                $score = max(0, min(100, (int)$data['score']));
+                $warning = $data['warning_message'] ?? 'Analyse effectuée';
+
+                return [
+                    'score' => $score,
+                    'warning_message' => $warning
+                ];
+            }
+        }
+
+        return [
+            'score' => 50,
+            'warning_message' => 'Analyse incertaine'
+        ];
     }
 
     // =========================
@@ -164,7 +195,7 @@ class GenerateRecommendationJob implements ShouldQueue
                 $score >= 50 => '🟡 Recommended',
                 default => '⚠️ Not Recommended',
             },
-            'warning_message' => $score < 50 ? $warning : null,
+            'warning_message' => $warning, // 🔥 TOUJOURS stocké
         ];
     }
 
@@ -179,5 +210,16 @@ class GenerateRecommendationJob implements ShouldQueue
             'status' => Recommendation::STATUS_FAILED,
             'score' => 0
         ]);
+    }
+
+
+    private function generateFallbackMessage(int $score, array $conflicts): string
+    {
+        if (empty($conflicts)) {
+            return "Ce plat semble compatible avec votre régime alimentaire.";
+        }
+
+        return "Attention : ce plat contient " . implode(', ', $conflicts) .
+            " ce qui peut être incompatible avec votre régime.";
     }
 }
