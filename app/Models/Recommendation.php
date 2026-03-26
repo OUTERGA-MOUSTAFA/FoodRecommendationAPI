@@ -14,4 +14,14 @@ class Recommendation extends Model
         'warning_message',
         'status',
     ];
+
+    public function plat()
+    {
+        return $this->belongsTo(Plat::class);
+    }
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

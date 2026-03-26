@@ -20,7 +20,7 @@ return new class extends Migration
 
             // score
             $table->float('score')->default(0);
-            
+            $table->string('label')->nullable();
             // label
             $table->text('warning_message')->nullable();
             // statut (processing / ready)

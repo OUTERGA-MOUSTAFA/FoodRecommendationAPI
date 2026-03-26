@@ -58,9 +58,11 @@ class IngredientController extends Controller
             'tags.*' => 'in:' . implode(',', Ingredient::TAGS),
         ]);
 
-        // 🔄 Update
-        $ingredient->update($validated);
-
+        //  Update
+        $ingredient->update([
+            'name' => $validated['name'] ?? $ingredient->name,
+            'tags' => $validated['tags'] ?? $ingredient->tags,
+        ]);
         return response()->json([
             'message' => 'Ingredient updated successfully',
             'data' => $ingredient

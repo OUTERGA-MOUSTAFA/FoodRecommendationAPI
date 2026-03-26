@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
-use App\Http\Resources\PlateResource;
 use App\Models\Categorie;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Jobs\GenerateRecommendationJob;
+use App\Models\Plat;
+use App\Models\Recommendation;
 
 class CategorieController extends Controller
 {
@@ -66,30 +66,43 @@ class CategorieController extends Controller
 
     public function show($id)
     {
-         $categorie = Categorie::with(['user', 'plats'])->findOrFail($id);
-        if (!$categorie) {
-            return response()->json([
-                'message' => 'Category not found',
-                'error' => 'NOT_FOUND'
-            ], 404);
-        }
-        $userId = auth()->id();
+        $user = auth()->user();
 
-        $plats = $categorie->plats()
-            // Filtrer disponibles (par défaut)
-            ->where('is_active', true)
+        $plats = Plat::where('is_available', true)->get();
 
-            // Ajouter score de recommandation
-            ->leftJoin('recommendations', function ($join) use ($userId) {
-                $join->on('plats.id', '=', 'recommendations.plat_id')
-                    ->where('recommendations.user_id', $userId);
-            })
+        $data = $plats->map(function ($plat) use ($user) {
 
-            ->select('plats.*', DB::raw('COALESCE(recommendations.score, 0) as recommendation_score'))
+            $recommendation = Recommendation::where([
+                'user_id' => $user->id,
+                'plat_id' => $plat->id
+            ])->first();
 
-            ->get();
+            // pas encore calculé
+            if (!$recommendation) {
 
-        return PlateResource::collection($plats);
+                // dispatch job
+                GenerateRecommendationJob::dispatch($plat, $user);
+
+                return [
+                    'id' => $plat->id,
+                    'name' => $plat->name,
+                    'status' => 'processing'
+                ];
+            }
+
+            return [
+                'id' => $plat->id,
+                'name' => $plat->name,
+                'score' => $recommendation->score,
+                'label' => $recommendation->label,
+                'warning_message' => $recommendation->warning_message,
+                'status' => $recommendation->status,
+            ];
+        });
+
+        return response()->json([
+            'data' => $data
+        ]);
     }
 
     public function update(Request $request, $id)

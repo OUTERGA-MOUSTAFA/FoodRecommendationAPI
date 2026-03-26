@@ -47,4 +47,11 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+    ],
+
+    'groq' => [
+        'url' => env('GROQ_API_URL'),
+    ],
 ];

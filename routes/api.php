@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategorieController;
+use App\Http\Controllers\Api\IngredientController;
 use App\Http\Controllers\Api\PlatsController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\RecommendationController;
 use App\Http\Controllers\Api\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 // Auth Actions
@@ -42,6 +44,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Création du endpoint DELETE /api/categorie/{id}
     Route::apiResource('categorie', CategorieController::class);
     
+    // ingredient
+    // GET /api/ingredient
+    // POST /api/ingredient
+    // PUT /api/ingredient/{id}
+    // DELETE /api/ingredient/{id}
+    Route::apiResource('ingredient', IngredientController::class);
+
     // GET /api/plat
     // GET /api/plat/{id}
     // POST /api/plat
@@ -53,5 +62,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/addTags', [ProfileController::class, 'updateProfile']);
     // DELETE /api/removeTags
     Route::delete('/removeTags', [ProfileController::class, 'removeTag']);
+
+    Route::post('/recommendations/analyze/{plate_id}', [RecommendationController::class, 'analyze']);
+    Route::apiResource('recommendations', RecommendationController::class);
 
 });

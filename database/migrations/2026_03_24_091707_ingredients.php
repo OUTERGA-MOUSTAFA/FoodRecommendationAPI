@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             
-            // 🏷️ tags stockés en JSON
+            // tags stockés en JSON
             $table->json('tags')->nullable();
 
             $table->timestamps();
