@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RecommendationResource;
 use App\Models\Plat;
 use App\Models\Recommendation;
 use App\Jobs\GenerateRecommendationJob;
+
 
 class RecommendationController extends Controller
 {
@@ -40,18 +42,20 @@ class RecommendationController extends Controller
 
     //  GET → historique
     public function index()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        $recommendations = Recommendation::where('user_id', $user->id)
-            ->with('plat')
-            ->latest()
-            ->get();
+    $query = Recommendation::query()
+        ->where('user_id', $user->id)
+        ->with(['plat:id,title']) // ✅ eager loading optimisé
+        ->latest();
 
-        return response()->json([
-            'data' => $recommendations
-        ]);
-    }
+    // 🔥 pagination
+    $recommendations = $query->paginate(10);
+
+    return RecommendationResource::collection($recommendations);
+}
+    
 
     //  GET → résultat d’un plat
     public function show($plate_id)
