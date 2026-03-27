@@ -1,0 +1,1345 @@
+{
+  "info": {
+    "_postman_id": "e838f611-93c3-41aa-8a8e-bbf1100422e4",
+    "name": "RestaurantAI-Brigade API (V2)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53288852",
+    "_collection_link": "https://go.postman.co/collection/53288852-e838f611-93c3-41aa-8a8e-bbf1100422e4?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Registering",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "pm.environment.set(\"access_token\", response.access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"client\",\r\n    \"email\": \"client@gmail.com\",\r\n    \"password\": \"12345678\",\r\n    \"password_confirmation\": \"12345678\",\r\n    \"dietary_tags\": [\"no_sugar\"]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/register",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "register"
+              ]
+            },
+            "description": "StartFragment\n\n## POST /api/register\n\n### 📄 Description\n\nCréer un compte client avec un **profil alimentaire (dietary profile)**.\n\n### 🔐 Auth\n\n❌ Non requise\n\n---\n\n### 📥 Request Body\n\n```\n{  \"name\": \"John Doe\",  \"email\": \"john@example.com\",  \"password\": \"password\",  \"password_confirmation\": \"password\",  \"dietary_preferences\": [    \"contains_gluten\",    \"contains_lactose\"  ]}\n\n ```\n\n---\n\n### ✅ Validation\n\n- `name`: required, string  \n    \n- `email`: required, email, unique  \n    \n- `password`: required, min 6, confirmed  \n    \n- `dietary_preferences`: array (optionnel)  \n    \n\n---\n\n### 📤 Response (201 Created)\n\n```\n{  \"message\": \"User registered successfully\",  \"token\": \"1|abcdefg...\",  \"user\": {    \"id\": 1,    \"name\": \"John Doe\",    \"email\": \"john@example.com\",    \"dietary_preferences\": [      \"contains_gluten\",      \"contains_lactose\"    ]  }}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "Login user",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "pm.environment.set(\"access_token\", response.access_token);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/login",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "description": "StartFragment\n\n## POST /api/login\n\n### 📄 Description\n\nSe connecter et obtenir un **token Sanctum**.\n\n### 🔐 Auth\n\n❌ Non requise\n\n---\n\n### 📥 Request Body\n\n```\n{  \"email\": \"john@example.com\",  \"password\": \"password\"}\n\n ```\n\n---\n\n### 📤 Response (200 OK)\n\n```\n{  \"message\": \"Login successful\",  \"token\": \"1|abcdefg...\",  \"user\": {    \"id\": 1,    \"name\": \"John Doe\",    \"email\": \"john@example.com\"  }}\n\n ```\n\n---\n\n### ❌ Erreur (401 Unauthorized)\n\n```\n{  \"message\": \"Invalid credentials\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "User infos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/me",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "me"
+              ]
+            },
+            "description": "StartFragment\n\n## GET /api/me\n\n### 📄 Description\n\nRécupérer les informations de l’utilisateur authentifié.\n\n### 🔐 Auth\n\n✅ Requise\n\n---\n\n### 📥 Headers\n\n```\nAuthorization: Bearer {token}\n\n ```\n\n---\n\n### 📤 Response (200 OK)\n\n```\n{  \"id\": 1,  \"name\": \"John Doe\",  \"email\": \"john@example.com\",  \"dietary_preferences\": [    \"contains_gluten\",    \"contains_lactose\"  ],  \"created_at\": \"2026-03-25T08:20:43\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/logout",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "logout"
+              ]
+            },
+            "description": "StartFragment\n\n## POST /api/logout\n\n### 📄 Description\n\nDéconnecter l’utilisateur en supprimant le token actif.\n\n### 🔐 Auth\n\n✅ Requise\n\n---\n\n### 📥 Headers\n\n```\nAuthorization: Bearer {token}\n\n ```\n\n---\n\n### 📤 Response (200 OK)\n\n```\n{  \"message\": \"Logged out successfully\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Category Management",
+      "item": [
+        {
+          "name": "List plates belonging to a category",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie/2/plats",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie",
+                "2",
+                "plats"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "2",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "## List Plates Belonging to a Category\n\nRetrieves all plates (dishes) that are associated with a specific category, identified by its ID in the URL path.\n\n### Authorization\n\nRequires a Bearer Token passed via the `Authorization` header.\n\n```\nAuthorization: Bearer {{access_token}}\n\n ```\n\n### Request Details\n\n| Property | Value |\n| --- | --- |\n| **Method** | `GET` |\n| **URL** | `http://127.0.0.1:8000/api/categorie/{id}/plats` |\n| **Body** | None |\n\n**Path Variables:**\n\n| Variable | Description |\n| --- | --- |\n| `id` | The ID of the category whose plates you want to retrieve (e.g., `2`) |\n\n**Headers:**\n\n- `Accept: application/json`\n    \n- `Content-Type: application/json`\n    \n\n### Expected Responses\n\n| Status Code | Meaning |\n| --- | --- |\n| `200 OK` | Successfully retrieved the list of plates for the given category |\n| `401 Unauthorized` | Missing or invalid Bearer token |\n| `404 Not Found` | No category found with the given ID |"
+          },
+          "response": []
+        },
+        {
+          "name": "Get category details",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "2",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "## Get Category Details\n\nRetrieves the full details of a specific category by its ID.\n\n### Authorization\n\nRequires a **Bearer Token** passed via the `Authorization` header. The token is referenced using the `{{access_token}}` environment variable.\n\n### Path Parameter\n\n| Parameter | Description |\n| --- | --- |\n| `id` | The unique identifier of the category to retrieve (e.g., `/api/categorie/1`) |\n\n### Headers\n\n| Key | Value |\n| --- | --- |\n| `Accept` | `application/json` |\n\n### Responses\n\n- **200 OK** — Returns the category object with its details (name, description, etc.)\n    \n- **401 Unauthorized** — Missing or invalid Bearer token\n    \n- **404 Not Found** — No category found with the given ID"
+          },
+          "response": []
+        },
+        {
+          "name": "List all categories",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie"
+              ]
+            },
+            "description": "## List All Categories\n\nRetrieves a list of all available food categories in the system.\n\n### Authorization\n\nRequires a Bearer Token passed via the `Authorization` header.\n\n```\nAuthorization: Bearer {{access_token}}\n\n ```\n\n### Request Details\n\n| Property | Value |\n| --- | --- |\n| **Method** | `GET` |\n| **URL** | `http://127.0.0.1:8000/api/categorie` |\n| **Body** | None |\n\n**Headers:**\n\n- `Accept: application/json`\n    \n- `Content-Type: application/json`\n    \n\n### Expected Responses\n\n| Status Code | Meaning |\n| --- | --- |\n| `200 OK` | Successfully retrieved the list of categories |\n| `401 Unauthorized` | Missing or invalid Bearer token |"
+          },
+          "response": []
+        },
+        {
+          "name": "Create a new category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Juice avoca\",\r\n    \"description\": \"Traditional Moroccain dishes\",\r\n    \"is_active\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie"
+              ]
+            },
+            "description": "Create Category\n\nThis endpoint allows admin to create a new category.\n\nAuthorization:  \nBearer Token required\n\nBody:  \n{  \n\"name\": \"Dessert\",  \n\"description\": \"Sweet dishes\"  \n}\n\nResponses:  \n201 → Created successfully  \n422 → Validation error  \n403 → Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "Update a category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Updated Moroccan Cuisine\",\r\n  \"description\": \"Updated description\",\r\n  \"is_active\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie",
+                "2"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "2",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "## Update a Category\n\nUpdates the details of an existing category identified by its ID in the URL path.\n\n### Authorization\n\nRequires a Bearer Token passed via the `Authorization` header.\n\n```\nAuthorization: Bearer {{access_token}}\n\n ```\n\n### Request Details\n\n| Property | Value |\n| --- | --- |\n| **Method** | `PUT` |\n| **URL** | `http://127.0.0.1:8000/api/categorie/{id}` |\n| **Body** | JSON |\n\n**Path Variables:**\n\n| Variable | Description |\n| --- | --- |\n| `id` | The ID of the category to update (e.g., `2`) |\n\n**Body Fields:**\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `name` | `string` | The updated name of the category |\n| `description` | `string` | The updated description of the category |\n| `is_active` | `boolean` | Whether the category is active or not |\n\n**Example Body:**\n\n``` json\n{\n  \"name\": \"Updated Moroccan Cuisine\",\n  \"description\": \"Updated description\",\n  \"is_active\": true\n}\n\n ```\n\n### Expected Responses\n\n| Status Code | Meaning |\n| --- | --- |\n| `200 OK` | Category updated successfully |\n| `400 Bad Request` | Invalid or missing fields in the request body |\n| `401 Unauthorized` | Missing or invalid Bearer token |\n| `404 Not Found` | No category found with the given ID |"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie",
+                "2"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "2",
+                  "description": "id category should be deleted",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "## Delete a Category\n\nDeletes an existing category identified by its ID. The ID can be provided both as a path segment in the URL and as a query parameter.\n\n### Authorization\n\nRequires a Bearer Token passed via the `Authorization` header.\n\n```\nAuthorization: Bearer {{access_token}}\n\n ```\n\n### Request Details\n\n| Property | Value |\n| --- | --- |\n| **Method** | `DELETE` |\n| **URL** | `http://127.0.0.1:8000/api/categorie/{id}` |\n| **Body** | None |\n\n**Path Variables:**\n\n| Variable | Description |\n| --- | --- |\n| `id` | The ID of the category to delete (e.g., `2`) |\n\n**Query Parameters:**\n\n| Parameter | Value | Description |\n| --- | --- | --- |\n| `id` | `2` | The ID of the category to be deleted |\n\n**Headers:**\n\n- `Accept: application/json`\n    \n- `Content-Type: application/json`\n    \n\n### Expected Responses\n\n| Status Code | Meaning |\n| --- | --- |\n| `200 OK` / `204 No Content` | Category deleted successfully |\n| `401 Unauthorized` | Missing or invalid Bearer token |\n| `404 Not Found` | No category found with the given ID |"
+          },
+          "response": []
+        }
+      ],
+      "description": "## Category Management\n\nThis collection covers all API operations related to managing food categories in the restaurant platform. Categories are used to organize plates (dishes) into logical groups such as \"Dessert\", \"Moroccan Cuisine\", etc.\n\n### What's Included\n\n- **Create** a new category with a name and description\n    \n- **List** all available categories\n    \n- **Get** details of a specific category by ID\n    \n- **Update** an existing category's name, description, or active status\n    \n- **Delete** a category by ID\n    \n- **List plates** belonging to a specific category\n    \n\n### Authentication\n\nAll requests in this collection require a **Bearer Token**. Set your token in the active environment under the `access_token` variable.\n\n```\nAuthorization: Bearer {{access_token}}\n\n ```\n\n### Base URL\n\n```\nhttp://127.0.0.1:8000/api/categorie\n\n ```\n\n### Notes\n\n- Path variables (e.g., category ID) are embedded directly in the URL.\n    \n- All requests expect and return JSON. Make sure to include `Accept: application/json` and `Content-Type: application/json` headers where applicable."
+    },
+    {
+      "name": "Ingredient Management",
+      "item": [
+        {
+          "name": "List all ingredients",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Tacoss\",\r\n  \"tags\": [\r\n    \"contains_meat\",\r\n    \"contains_cholesterol\"\r\n  ]\r\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/ingredient",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "ingredient"
+              ]
+            },
+            "description": "StartFragment\n\n## GET /api/ingredients\n\n### 📄 Description\n\nRécupérer la liste de tous les ingrédients.\n\n### 🔐 Auth\n\nAdmin uniquement\n\n### 📥 Request\n\nAucun paramètre requis.\n\n### 📤 Response (200 OK)\n\n```\n{  \"data\": [    {      \"id\": 1,      \"name\": \"Chicken\",      \"tags\": [\"contains_meat\"]    },    {      \"id\": 2,      \"name\": \"Milk\",      \"tags\": [\"contains_lactose\"]    }  ]}\n\n ```\n\nStartFragment\n\n# Gestion des erreurs\n\n### 🔴 401 Unauthorized\n\n```\n{  \"message\": \"Unauthenticated\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "Create an ingredient",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Leat no sugar\",\r\n  \"tags\": [\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/ingredient",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "ingredient"
+              ]
+            },
+            "description": "StartFragment\n\n## POST /api/ingredients\n\n### 📄 Description\n\nCréer un nouvel ingrédient.\n\n### 🔐 Auth\n\nAdmin uniquement\n\n### 📥 Request Body\n\n```\n{  \"name\": \"Chicken\",  \"tags\": [    \"contains_meat\",    \"contains_cholesterol\"  ]}\n\n ```\n\n### Validation\n\n- `name`: **required**, string, max 255\n    \n- `tags`: array (optionnel)\n    \n- `tags.\\\\*`: doit être parmi les valeurs autorisées\n    \n\n### 📤 Response (201 Created)\n\n```\n{  \"message\": \"Ingredient created successfully\",  \"data\": {    \"id\": 2,    \"name\": \"Chicken\",    \"tags\": [      \"contains_meat\",      \"contains_cholesterol\"    ]  }}\n\n ```\n\nStartFragment\n\n# Gestion des erreurs\n\n### 🔴 401 Unauthorized\n\n```\n{  \"message\": \"Unauthenticated\"}\n\n ```\n\n### 🔴 403 Forbidden\n\n```\n{  \"message\": \"Access denied\"}\n\n ```\n\n### 🔴 422 Validation Error\n\n```\n{  \"message\": \"Validation failed\",  \"errors\": {    \"name\": [\"The name field is required.\"]  }}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "Update an ingredient",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"test update\",\r\n  \"tags\": [\r\n    \"contains_lactose\"\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/ingredient/2",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "ingredient",
+                "2"
+              ]
+            },
+            "description": "StartFragment\n\n## PUT /api/ingredients/{id}\n\n### 📄 Description\n\nMettre à jour un ingrédient existant.\n\n### 🔐 Auth\n\nAdmin uniquement\n\n### 📥 Request Body\n\n```\n{  \"name\": \"Chicken Updated\",  \"tags\": [    \"contains_meat\",    \"contains_cholesterol\"  ]}\n\n ```\n\n### ⚠️ Notes\n\n- Si tu envoies `tags`, il faut remplacer complètement les anciens tags.\n    \n- Si problème chez toi (comme tu as montré), c’est souvent:\n    \n    - problème de **sync / update array**\n        \n    - ou validation mal configurée\n        \n\n### 📤 Response (200 OK)\n\n```\n{  \"message\": \"Ingredient updated successfully\",  \"data\": {    \"id\": 2,    \"name\": \"Chicken Updated\",    \"tags\": [      \"contains_meat\",      \"contains_cholesterol\"    ]  }}\n\n ```\n\nStartFragment\n\n# Gestion des erreurs\n\n### 🔴 401 Unauthorized\n\n```\n{  \"message\": \"Unauthenticated\"}\n\n ```\n\n### 🔴 403 Forbidden\n\n```\n{  \"message\": \"Access denied\"}\n\n ```\n\n### 🔴 422 Validation Error\n\n```\n{  \"message\": \"Validation failed\",  \"errors\": {    \"name\": [\"The name field is required.\"]  }}\n\n ```\n\n### 🔴 404 Not Found\n\n```\n{  \"message\": \"Ingredient not found\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete an ingredient",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/ingredient/1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "ingredient",
+                "1"
+              ]
+            },
+            "description": "StartFragment\n\n## DELETE /api/ingredients/{id}\n\n### 📄 Description\n\nSupprimer un ingrédient.\n\n### 🔐 Auth\n\nAdmin uniquement\n\n### 📥 Request\n\nAucun body requis\n\n### 📤 Response (200 OK)\n\n```\n{  \"message\": \"Ingredient deleted successfully\"}\n\n ```\n\n# Gestion des erreurs\n\n### 🔴 401 Unauthorized\n\n```\n{  \"message\": \"Unauthenticated\"}\n\n ```\n\n### 🔴 403 Forbidden\n\n```\n{  \"message\": \"Access denied\"}\n\n ```\n\n### 🔴 404 Not Found\n\n```\n{  \"message\": \"Ingredient not found\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Plate Management",
+      "item": [
+        {
+          "name": "List all plates with recommendation score",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/plat",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "plat"
+              ]
+            },
+            "description": "Retrieves a list of all plates available in the system, each enriched with its AI-based recommendation score.\n\n**Authentication**  \nRequires a Bearer token passed via the `{{access_token}}` environment variable.\n\n**Headers**\n\n- `Accept: application/json`\n    \n\n**What it does**\n\n- Sends a `GET` request to `/api/plat`\n    \n- Returns all plates along with their associated recommendation scores\n    \n- Useful for displaying a ranked or scored menu to end users\n    \n\n**Notes**\n\n- No request body is required\n    \n- Ensure `{{access_token}}` is set in the active environment before sending"
+          },
+          "response": []
+        },
+        {
+          "name": "Plate details with recommendation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/plat/12",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "plat",
+                "12"
+              ]
+            },
+            "description": "Retrieves the full details of a specific plate, including its AI-generated recommendation data.\n\n**Authentication**  \nRequires a Bearer token passed via the `{{access_token}}` environment variable.\n\n**Headers**\n\n- `Accept: application/json`\n    \n\n**What it does**\n\n- Sends a `GET` request to `/api/plat/{id}` (e.g., `/api/plat/1`)\n    \n- Returns detailed information about a single plate, including its recommendation score and related metadata\n    \n- Useful for plate detail pages or recommendation-driven views\n    \n\n**Notes**\n\n- No request body is required\n    \n- Replace the plate ID in the URL with the target plate's ID\n    \n- Ensure `{{access_token}}` is set in the active environment before sending"
+          },
+          "response": []
+        },
+        {
+          "name": "Update a plate",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"ftoor updated\",\r\n  \"description\": \"Very good dish\",\r\n  \"price\": 50.55,\r\n  \"is_available\": 1,\r\n  \"category_id\": [8,4]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/plat/13",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "plat",
+                "13"
+              ]
+            },
+            "description": "Updates the details of an existing plate identified by its ID.\n\n**Authentication**  \nRequires a Bearer token passed via the `{{access_token}}` environment variable.\n\n**Headers**\n\n- `Accept: application/json`\n    \n\n**What it does**\n\n- Sends a `PUT` request to `/api/plat/{id}` (e.g., `/api/plat/13`)\n    \n- Replaces the plate's existing data with the provided fields\n    \n\n**Request Body Fields**\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `title` | `string` | The updated name of the plate |\n| `description` | `string` | A short description of the dish |\n| `price` | `number` | The updated price of the plate |\n| `is_available` | `integer` | Availability flag (`1` = available, `0` = unavailable) |\n| `category_id` | `array` | List of category IDs to associate with the plate |\n\n**Notes**\n\n- Replace the plate ID in the URL with the target plate's ID\n    \n- Ensure `{{access_token}}` is set in the active environment before sending"
+          },
+          "response": []
+        },
+        {
+          "name": "Create a new plate",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"test12\",\r\n  \"description\": \"test description11\",\r\n  \"price\": 10,\r\n  \"is_available\": 1,\r\n  \"category_id\": [2,3],\r\n  \"ingredient_ids\": [5,8]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/plat",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "plat"
+              ]
+            },
+            "description": "Creates a new plate entry in the system with the specified details, categories, and ingredients.\n\n**Authentication**  \nRequires a Bearer token passed via the `{{access_token}}` environment variable.\n\n**Headers**\n\n- `Accept: application/json`\n    \n\n**What it does**\n\n- Sends a `POST` request to `/api/plat`\n    \n- Creates a new plate record and associates it with the given categories and ingredients\n    \n\n**Request Body Fields**\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `title` | `string` | The name of the new plate |\n| `description` | `string` | A short description of the dish |\n| `price` | `number` | The price of the plate |\n| `is_available` | `integer` | Availability flag (`1` = available, `0` = unavailable) |\n| `category_id` | `array` | List of category IDs to associate with the plate |\n| `ingredient_ids` | `array` | List of ingredient IDs to link to the plate |\n\n**Notes**\n\n- Ensure `{{access_token}}` is set in the active environment before sending"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a plate",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/plat/3",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "plat",
+                "3"
+              ]
+            },
+            "description": "Permanently deletes a plate from the system by its ID.\n\n**Authentication**  \nRequires a Bearer token passed via the `{{access_token}}` environment variable.\n\n**Headers**\n\n- `Accept: application/json`\n    \n\n**What it does**\n\n- Sends a `DELETE` request to `/api/plat/{id}` (e.g., `/api/plat/3`)\n    \n- Removes the specified plate record from the database\n    \n\n**Notes**\n\n- No request body is required\n    \n- This action is **irreversible** — ensure the correct plate ID is specified before sending\n    \n- Replace the plate ID in the URL with the target plate's ID\n    \n- Ensure `{{access_token}}` is set in the active environment before sending"
+          },
+          "response": []
+        }
+      ],
+      "description": "## Plate Management\n\nThis collection covers the full lifecycle of managing plates (menu items) within the RestaurantAI-Brigade API. It provides endpoints to **create**, **read**, **update**, and **delete** plates, as well as retrieve enriched plate data that includes AI-generated recommendation scores.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/plat` | List all plates along with their AI recommendation scores |\n| `GET` | `/api/plat/{id}` | Retrieve full details of a specific plate, including its recommendation data |\n| `POST` | `/api/plat` | Create a new plate |\n| `PUT` | `/api/plat/{id}` | Update an existing plate's information |\n| `DELETE` | `/api/plat/{id}` | Delete a plate by its ID |\n\n### Notes\n\n- All requests target the local development server at `http://127.0.0.1:8000`.\n    \n- Authentication may be required — ensure the `access_token` environment variable is set before sending requests.\n    \n- Plate listing and detail endpoints return recommendation scores computed by the AI engine, making this collection closely related to the **AI Recommendations** collection."
+    },
+    {
+      "name": "Profiel",
+      "item": [
+        {
+          "name": "create Categorie",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Moroccain Cuisine\",\r\n    \"description\": \"Traditional Italian dishes\",\r\n    \"is_active\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/categorie",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "categorie"
+              ]
+            },
+            "description": "Creates a new food category in the system. Sends a `POST` request to `/api/categorie` with a JSON body containing the category `name`, a `description`, and an `is_active` boolean flag. Requires a valid Bearer token (`{{access_token}}`)."
+          },
+          "response": []
+        },
+        {
+          "name": "Update dietary Tags profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"dietary_tags\": [\"vegan\", \"no_cholesterol\"]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/updateTags",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "updateTags"
+              ]
+            },
+            "description": "Updates the dietary preference tags associated with the authenticated user's profile. This request sends a `PUT` to `/api/updateTags` with a JSON body containing a `dietary_tags` array (e.g., `vegan`, `no_cholesterol`). Authentication is handled via a Bearer token (`{{access_token}}`). Use this endpoint to replace the user's current dietary tags with a new set of preferences, which are then used to personalize AI-powered meal recommendations."
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Tags",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"dietary_tags\": [\"vegan\"]\r\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/removeTags",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "removeTags"
+              ]
+            },
+            "description": "Removes one or more dietary preference tags from the authenticated user's profile. Sends a `DELETE` request to `/api/removeTags` with a JSON body containing a `dietary_tags` array listing the tags to be removed (e.g., `\"vegan\"`). Requires a valid Bearer token (`{{access_token}}`)."
+          },
+          "response": []
+        }
+      ],
+      "description": "## Profiel\n\nThis collection covers the **user profile management** endpoints of the RestaurantAI-Brigade API. It provides the requests needed to retrieve authenticated user information and manage the dietary preferences associated with a user's profile.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/user` | Retrieve the authenticated user's profile information |\n| `PUT` | `/api/updateTags` | Add or update dietary tags on the user's profile (e.g. `vegan`, `no_cholesterol`) |\n| `DELETE` | `/api/removeTags` | Remove one or more dietary tags from the user's profile |\n| `POST` | `/api/categorie` | Create a new food category |\n\n### Authentication\n\nAll requests use **Bearer Token** authentication via the `{{access_token}}` environment variable. Make sure the `restaurant` environment is active and that `access_token` is set before sending any request.\n\n---"
+    },
+    {
+      "name": "AI Recommendations",
+      "item": [
+        {
+          "name": "Launch compatibility analysis",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/recommendations/analyze/12",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "recommendations",
+                "analyze",
+                "12"
+              ]
+            },
+            "description": "StartFragment\n\n## POST /api/recommendations/analyze/{plate_id}\n\n### 📄 Description\n\nLancer une analyse de compatibilité pour un plat.\n\n👉 Cette action :\n\n-   \n    crée une recommendation avec `status = processing`\n    \n-   \n    dispatch un **Job (Queue)**\n    \n-   \n    calcule le score en background  \n    \n\n---\n\n### 🔐 Auth\n\n✅ Requise\n\n---\n\n### 📥 Request\n\nAucun body requis\n\n---\n\n### 📤 Response (202 Accepted)\n\n```\n{  \"message\": \"Analysis started\",  \"status\": \"processing\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "Get recommendation result",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/recommendations/14",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "recommendations",
+                "14"
+              ]
+            },
+            "description": "StartFragment\n\n## GET /api/recommendations/{plate_id}\n\n### 📄 Description\n\nRécupérer le résultat d’analyse pour un plat spécifique.\n\n---\n\n### 🔐 Auth\n\n✅ Requise\n\n---\n\n### 📤 Response (200 OK)\n\n### ✔️ Cas 1: Analyse terminée\n\n```\n{  \"plate_id\": 1,  \"score\": 40,  \"label\": \"Not Recommended\",  \"warning_message\": \"This plate contains lactose and gluten which do not match your dietary preferences.\",  \"status\": \"ready\"}\n\n ```\n\n---\n\n### ⏳ Cas 2: En cours\n\n```\n{  \"plate_id\": 1,  \"status\": \"processing\"}\n\n ```\n\n---\n\n### ❌ Cas 3: Non trouvée\n\n```\n{  \"message\": \"Recommendation not found\"}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        },
+        {
+          "name": "View recommendation history",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/recommendations",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "recommendations"
+              ]
+            },
+            "description": "StartFragment\n\n## GET /api/recommendations\n\n### 📄 Description\n\nRécupérer l’historique des recommandations de l’utilisateur.\n\n---\n\n### 🔐 Auth\n\n✅ Requise\n\n---\n\n### 📤 Response (200 OK)\n\n```\n{  \"data\": [    {      \"plate_id\": 1,      \"score\": 85,      \"label\": \"Highly Recommended\",      \"status\": \"ready\"    },    {      \"plate_id\": 2,      \"score\": null,      \"label\": null,      \"status\": \"processing\"    }  ]}\n\n ```\n\nEndFragment"
+          },
+          "response": []
+        }
+      ],
+      "description": "StartFragment\n\n# 🤖 AI Recommendations API (Queue & Jobs)\n\n## 📌 Description\n\nCe module permet de lancer une **analyse de compatibilité alimentaire** entre un utilisateur et un plat (**plate**), en utilisant des **Jobs Laravel (queue)**.\n\n-   \n    L’analyse est **asynchrone** (status = `processing` → `ready`)  \n    \n-   \n    Résultat basé sur les **préférences alimentaires** et les **tags des ingrédients**\n    \n\n---\n\n## 🔐 Authentication\n\nToutes les routes nécessitent un utilisateur authentifié (Sanctum)\n\n```\nAuthorization: Bearer {token}\n\n ```\n\n---\n\n# 📊 Structure d’une Recommendation\n\n```\n{  \"plate_id\": 1,  \"score\": 85,  \"label\": \"Highly Recommended\",  \"warning_message\": null,  \"status\": \"ready\",  \"created_at\": \"2026-03-25T10:00:00\"}\n\n ```\n\n---\n\n# 🧠 Scoring Rules\n\n| Score | Résultat |\n| --- | --- |\n| ≥ 80 | Highly Recommended |\n| 50 – 79 | Recommended with notes |\n| < 50 | Not Recommended ⚠️ |\n\nEndFragment"
+    },
+    {
+      "name": "Admin Statistiques",
+      "item": [
+        {
+          "name": "Admin Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "StartFragment\n\n## GET /api/admin/stats\n\n### 📄 Description\n\nRetourne les statistiques globales de l’application.\n\n---\n\n### 📥 Request\n\nAucun paramètre requis\n\n---\n\n### 📤 Response (200 OK)\n\n```\n{  \"users_count\": 120,  \"ingredients_count\": 45,  \"plates_count\": 30,  \"recommendations_count\": 300,  \"recommendations\": {    \"highly_recommended\": 120,    \"recommended\": 100,    \"not_recommended\": 80  },  \"processing_recommendations\": 12,  \"average_score\": 67.5}\n\n ```\n\n---\n\n# 📊 Détails des champs\n\n### 👥 `users_count`\n\nNombre total d’utilisateurs\n\n### 🥗 `ingredients_count`\n\nNombre total d’ingrédients\n\n### 🍽️ `plates_count`\n\nNombre total de plats\n\n### 🤖 `recommendations_count`\n\nNombre total d’analyses effectuées\n\n---\n\n### 📈 `recommendations`\n\nRépartition des résultats :\n\n- `highly_recommended` → score ≥ 80\n    \n- `recommended` → score entre 50 et 79\n    \n- `not_recommended` → score < 50\n    \n\n---\n\n### ⏳ `processing_recommendations`\n\nNombre d’analyses en cours (`status = processing`)\n\n---\n\n### 📊 `average_score`\n\nScore moyen global des recommandations\n\nEndFragment"
+          },
+          "response": []
+        }
+      ],
+      "description": "StartFragment\n\n# Admin Statistics API\n\n## 📌 Description\n\nPermet à un **administrateur** de récupérer une **vue globale des statistiques** de l’application.\n\n👉 Utile pour :\n\n-   \n    Dashboard admin  \n    \n-   \n    Monitoring activité  \n    \n-   \n    Analyse des recommandations  \n    \n\n---\n\n## 🔐 Authentication\n\n✅ Admin uniquement (Sanctum + rôle Admin)\n\n```\nAuthorization: Bearer {token}\n\n ```\n\nEndFragment"
+    }
+  ]
+}

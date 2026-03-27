@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Logout
     Route::post('/logout', [AuthController::class, 'logout']);
     // get User
-    Route::get('/user', [AuthController::class, 'me']);
+    Route::get('/me', [AuthController::class, 'me']);
 
     
     // Création du endpoint GET /api/categories
