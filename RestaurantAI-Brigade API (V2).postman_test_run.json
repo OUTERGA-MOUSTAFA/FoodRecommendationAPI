@@ -1,0 +1,633 @@
+{
+	"id": "f4b1a53a-4a09-470f-8cbe-42ec7c157f8a",
+	"name": "RestaurantAI-Brigade API (V2)",
+	"timestamp": "2026-03-27T15:44:51.387Z",
+	"collection_id": "53288852-e838f611-93c3-41aa-8a8e-bbf1100422e4",
+	"folder_id": 0,
+	"environment_id": "53288852-d91184c7-d4aa-4cd5-b6d5-c81aaea6d7b3",
+	"totalPass": 1,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2026-03-27T15:44:41.465Z",
+	"totalFail": 5,
+	"results": [
+		{
+			"id": "64199fa3-abda-4b97-bd27-4d6e40e1755c",
+			"name": "Registering",
+			"url": "http://127.0.0.1:8000/api/register",
+			"time": 401,
+			"responseCode": {
+				"code": 422,
+				"name": "Unprocessable Content"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				401
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e5d5368a-bb59-4f99-ba1e-12cd9848d8cf",
+			"name": "Login user",
+			"url": "http://127.0.0.1:8000/api/login",
+			"time": 686,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				686
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "7fdd7cc6-de1e-4a0d-9d30-6ea1c9b1556b",
+			"name": "User infos",
+			"url": "http://127.0.0.1:8000/api/me",
+			"time": 346,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				346
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "714d1c06-a497-4474-a8ba-1a9af5602949",
+			"name": "logout",
+			"url": "http://127.0.0.1:8000/api/logout",
+			"time": 338,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				338
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "7bb3bc09-caac-45ca-9cb7-d1f2d03e0614",
+			"name": "List plates belonging to a category",
+			"url": "http://127.0.0.1:8000/api/categorie/2/plats",
+			"time": 177,
+			"responseCode": {
+				"code": 405,
+				"name": "Method Not Allowed"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				177
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "8e030986-8d93-4511-a656-df517acbdb43",
+			"name": "Get category details",
+			"url": "http://127.0.0.1:8000/api/categorie/1",
+			"time": 212,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				212
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "37f16576-a22d-4916-937e-a3e4a4e177ab",
+			"name": "List all categories",
+			"url": "http://127.0.0.1:8000/api/categorie",
+			"time": 217,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				217
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "0f5fe945-ffdf-41db-9c6a-fbd0f06d457f",
+			"name": "Create a new category",
+			"url": "http://127.0.0.1:8000/api/categorie",
+			"time": 213,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				213
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "bff1591f-a1e3-458f-933f-b4d12156655d",
+			"name": "Update a category",
+			"url": "http://127.0.0.1:8000/api/categorie/2",
+			"time": 224,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				224
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "ce9e42c2-b3e5-445b-bfec-2543d94c1538",
+			"name": "Delete a category",
+			"url": "http://127.0.0.1:8000/api/categorie/2",
+			"time": 216,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				216
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "9d3345e8-234a-482d-981d-383fc6a0cbd1",
+			"name": "List all ingredients",
+			"url": "http://127.0.0.1:8000/api/ingredient",
+			"time": 333,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				333
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "dac7cd8d-749f-45a9-8352-84708b089e8a",
+			"name": "Create an ingredient",
+			"url": "http://127.0.0.1:8000/api/ingredient",
+			"time": 216,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				216
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "59c3a41e-1e2a-48d4-8bff-c0521d5faa05",
+			"name": "Update an ingredient",
+			"url": "http://127.0.0.1:8000/api/ingredient/2",
+			"time": 332,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				332
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "0f18b40a-394b-4533-8887-acc055660eaa",
+			"name": "Delete an ingredient",
+			"url": "http://127.0.0.1:8000/api/ingredient/1",
+			"time": 226,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				226
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "e3e31ff7-4e95-4299-a23d-a76fc71b4a57",
+			"name": "List all plates with recommendation score",
+			"url": "http://127.0.0.1:8000/api/plat",
+			"time": 225,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				225
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "0c7a0ab5-e9c4-410a-8249-bc746849c844",
+			"name": "Plate details with recommendation",
+			"url": "http://127.0.0.1:8000/api/plat/12",
+			"time": 214,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				214
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "6d4317c8-af6f-4f7b-8faa-e057b3be78b1",
+			"name": "Update a plate",
+			"url": "http://127.0.0.1:8000/api/plat/13",
+			"time": 227,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				227
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "1d74d234-12bb-4be4-80c9-0d9b329a705f",
+			"name": "Create a new plate",
+			"url": "http://127.0.0.1:8000/api/plat",
+			"time": 215,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				215
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "ed3575f8-cd07-4110-9ecc-1c3aa31445f8",
+			"name": "Delete a plate",
+			"url": "http://127.0.0.1:8000/api/plat/3",
+			"time": 217,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				217
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "519e4e40-8730-4dc1-8116-c94579405a95",
+			"name": "create Categorie",
+			"url": "http://127.0.0.1:8000/api/categorie",
+			"time": 217,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				217
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "86f2e06f-c161-4e73-a24d-f0b0d2f18b6a",
+			"name": "Update dietary Tags profile",
+			"url": "http://127.0.0.1:8000/api/updateTags",
+			"time": 175,
+			"responseCode": {
+				"code": 405,
+				"name": "Method Not Allowed"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				175
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "a501ffd0-6f4f-41cb-b639-931835e38eb4",
+			"name": "Remove Tags",
+			"url": "http://127.0.0.1:8000/api/removeTags",
+			"time": 228,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				228
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "ecc4c1ac-da5f-4e4d-a9ad-76058f1edfc6",
+			"name": "Launch compatibility analysis",
+			"url": "http://127.0.0.1:8000/api/recommendations/analyze/12",
+			"time": 228,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				228
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "083da69b-ca99-4da2-b82e-73030f6a3d89",
+			"name": "Get recommendation result",
+			"url": "http://127.0.0.1:8000/api/recommendations/14",
+			"time": 331,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				331
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "28881aa7-84cc-48eb-ad8c-251a41b3b910",
+			"name": "View recommendation history",
+			"url": "http://127.0.0.1:8000/api/recommendations",
+			"time": 316,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {},
+			"testPassFailCounts": {},
+			"times": [
+				316
+			],
+			"allTests": [
+				{}
+			]
+		},
+		{
+			"id": "71e2f047-d1f5-4ea1-9b52-ce9a29a34ea4",
+			"name": "Admin Statistics",
+			"url": "http://127.0.0.1:8000/api/admin/stats",
+			"time": 229,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Response time is less than 200ms": false,
+				"Successful POST request": false,
+				"Content-Type is present": true,
+				"Your test name": false,
+				"Body matches string": false,
+				"Status code is 200": false
+			},
+			"testPassFailCounts": {
+				"Response time is less than 200ms": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Successful POST request": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Content-Type is present": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Your test name": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Body matches string": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				229
+			],
+			"allTests": [
+				{
+					"Response time is less than 200ms": false,
+					"Successful POST request": false,
+					"Content-Type is present": true,
+					"Your test name": false,
+					"Body matches string": false,
+					"Status code is 200": false
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 6959,
+	"collection": {
+		"requests": [
+			{
+				"id": "64199fa3-abda-4b97-bd27-4d6e40e1755c",
+				"method": "POST"
+			},
+			{
+				"id": "e5d5368a-bb59-4f99-ba1e-12cd9848d8cf",
+				"method": "POST"
+			},
+			{
+				"id": "7fdd7cc6-de1e-4a0d-9d30-6ea1c9b1556b",
+				"method": "GET"
+			},
+			{
+				"id": "714d1c06-a497-4474-a8ba-1a9af5602949",
+				"method": "POST"
+			},
+			{
+				"id": "7bb3bc09-caac-45ca-9cb7-d1f2d03e0614",
+				"method": "GET"
+			},
+			{
+				"id": "8e030986-8d93-4511-a656-df517acbdb43",
+				"method": "GET"
+			},
+			{
+				"id": "37f16576-a22d-4916-937e-a3e4a4e177ab",
+				"method": "GET"
+			},
+			{
+				"id": "0f5fe945-ffdf-41db-9c6a-fbd0f06d457f",
+				"method": "POST"
+			},
+			{
+				"id": "bff1591f-a1e3-458f-933f-b4d12156655d",
+				"method": "PUT"
+			},
+			{
+				"id": "ce9e42c2-b3e5-445b-bfec-2543d94c1538",
+				"method": "DELETE"
+			},
+			{
+				"id": "9d3345e8-234a-482d-981d-383fc6a0cbd1",
+				"method": "GET"
+			},
+			{
+				"id": "dac7cd8d-749f-45a9-8352-84708b089e8a",
+				"method": "POST"
+			},
+			{
+				"id": "59c3a41e-1e2a-48d4-8bff-c0521d5faa05",
+				"method": "PUT"
+			},
+			{
+				"id": "0f18b40a-394b-4533-8887-acc055660eaa",
+				"method": "DELETE"
+			},
+			{
+				"id": "e3e31ff7-4e95-4299-a23d-a76fc71b4a57",
+				"method": "GET"
+			},
+			{
+				"id": "0c7a0ab5-e9c4-410a-8249-bc746849c844",
+				"method": "GET"
+			},
+			{
+				"id": "6d4317c8-af6f-4f7b-8faa-e057b3be78b1",
+				"method": "PUT"
+			},
+			{
+				"id": "1d74d234-12bb-4be4-80c9-0d9b329a705f",
+				"method": "POST"
+			},
+			{
+				"id": "ed3575f8-cd07-4110-9ecc-1c3aa31445f8",
+				"method": "DELETE"
+			},
+			{
+				"id": "519e4e40-8730-4dc1-8116-c94579405a95",
+				"method": "POST"
+			},
+			{
+				"id": "86f2e06f-c161-4e73-a24d-f0b0d2f18b6a",
+				"method": "PUT"
+			},
+			{
+				"id": "a501ffd0-6f4f-41cb-b639-931835e38eb4",
+				"method": "DELETE"
+			},
+			{
+				"id": "ecc4c1ac-da5f-4e4d-a9ad-76058f1edfc6",
+				"method": "POST"
+			},
+			{
+				"id": "083da69b-ca99-4da2-b82e-73030f6a3d89",
+				"method": "GET"
+			},
+			{
+				"id": "28881aa7-84cc-48eb-ad8c-251a41b3b910",
+				"method": "GET"
+			},
+			{
+				"id": "71e2f047-d1f5-4ea1-9b52-ce9a29a34ea4",
+				"method": "GET"
+			}
+		]
+	}
+}
